@@ -1,0 +1,53 @@
+version: '1.0'
+services:
+  - name: db
+    type: postgres
+    version: 11.0
+    configuration: StandAlone
+    ports:
+      - 5432
+    username: strapi
+    database: strapi
+    userPassword: null
+    remoteAccess: false
+    deployTo:
+      - strapi
+
+  - name: strapi
+    type: docker
+    image: strapi/strapi
+    version: latest
+    globalDeps: apk add bash
+    ports:
+      - 1337
+    remoteAccess: false
+    env:
+      APP_NAME: strapi-app
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: "{{=service('db').getMasterAlias()}}"
+      DATABASE_PORT: "{{=service('db').getMainPort()}}"
+      DATABASE_NAME: "{{=service('db').get('database')}}"
+      DATABASE_USERNAME: "{{=service('db').get('username')}}"
+      DATABASE_PASSWORD: "{{=service('db').get('userPassword')}}"
+    volumes:
+      - directory: /usr/src/api/strapi-app
+    deployTo:
+      - strapi
+
+  - name: web
+    type: nginx
+    version: 1.15
+    ports:
+      - 80
+      - 443
+    remoteAccess: true
+    serviceFiles:
+      - name: strapi
+    deployTo:
+      - strapi
+
+hosts:
+  - name: strapi
+    requirements:
+      cores: 1
+      memory: 1
