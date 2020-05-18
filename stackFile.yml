@@ -2,7 +2,7 @@ version: '1.0'
 services:
   - name: db
     type: postgres
-    version: 11.1
+    version: 11.7
     configuration: StandAlone
     ports:
       - 5432
@@ -17,7 +17,6 @@ services:
     type: docker
     image: strapi/strapi
     version: latest
-    globalDeps: apk add bash
     ports:
       - 1337
     remoteAccess: false
@@ -36,7 +35,7 @@ services:
 
   - name: web
     type: nginx
-    version: 1.15
+    version: 1.17
     ports:
       - 80
       - 443
